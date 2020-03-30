@@ -20,6 +20,7 @@ from .utils.config import Config
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'test'])
+    parser.add_argument('pretrain', type=bool, default=True)
     parser.add_argument('config')
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--fold', type=int, required=True)
@@ -76,7 +77,7 @@ def train(cfg):
     tdl_valid = TfmdDL(dsrc.valid, bs=bs, after_item=item_tfms, after_batch=batch_tfms, device=default_device())
     
     dbch = DataLoaders(tdl_train, tdl_valid, device=default_device()) 
-    model = CascadeModel(arch=cfg.arch, n=dbch.c, cfg.pretrain)
+    model = CascadeModel(arch=cfg.arch, n=dbch.c, pre=cfg.pretrain)
     loss_function = factory.get_loss(cfg)
     optimizer = factory.get_optim(cfg)
     bot_lr,top_lr = cfg.sliced_lr
