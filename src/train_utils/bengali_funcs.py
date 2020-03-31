@@ -1,5 +1,6 @@
 from fastai2.vision.all import *
 from fastai2.basics import *
+from sklearn.metrics import recall_score
     
     
 def get_labels(x): return tensor(x[1:4].astype('uint8'))    
@@ -75,6 +76,40 @@ class GridMask(RandTransform):
         mask = tensor(mask.float()).to(default_device())
         image *= mask[rand_h:rand_h+h, rand_w:rand_w+w]
         return image
+
+    
+class Loss_combine(Module):
+    def __init__(self):
+        super().__init__()
+        
+    def forward(self, input, target,reduction='mean'):
+        x1,x2,x3 = input
+        x1,x2,x3 = x1.float(),x2.float(),x3.float()
+        y = target.long()
+        return 0.7*F.cross_entropy(x1,y[:,0],reduction=reduction) + 0.1*F.cross_entropy(x2,y[:,1],reduction=reduction) + \
+          0.2*F.cross_entropy(x3,y[:,2],reduction=reduction)
+    
+    
+class OHEM(Module):
+    def __init__(self, top_k=0.7, weights=[0.7, 0.1, 0.2]):
+        super(OHEM, self).__init__()
+        self.loss = F.cross_entropy
+        self.top_k = top_k
+        self.weights = weights
+    
+    def forward(self, input, target, cb_reduction='mean', index=None):
+        y,loss = target.long(),0
+        
+        for idx, row in enumerate(input):
+            gt = y[:, idx]
+            loss += self.weights[idx] * self.loss(row, gt, reduction='none', ignore_index=-1)
+
+        if self.top_k == 1: valid_loss = loss
+
+        self.index = torch.topk(loss, int(self.top_k * loss.size()[0])) if index is None else index
+        valid_loss = loss[self.index[1]]
+
+        return valid_loss.mean() if cb_reduction == 'mean' else valid_loss
     
     
 class RecallPartial(Metric):

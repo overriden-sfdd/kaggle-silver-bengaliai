@@ -24,6 +24,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'test'])
     parser.add_argument('config')
+    parser.add_argument('--epochs', type=int, default=40)
     parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--fold', type=int, required=True)
     parser.add_argument('--gpu', type=int, default=0)
@@ -40,6 +41,7 @@ def main():
     cfg.mode = args.mode
     cfg.pretrain = args.pretrain
     cfg.fold = args.fold
+    cfg.epochs = args.epochs
     cfg.output = args.output
     cfg.gpu = args.gpu
 
@@ -85,10 +87,10 @@ def train(cfg, arch):
     bot_lr,top_lr = cfg.sliced_lr
     aug_cbs,train_cbs = factory.get_cbs(cfg)
     
-    learn = Learner(dbch, model, loss_func=loss_function, optimizer=optimizer, cbs=aug_cbs,
+    learn = Learner(dbch, model, loss_func=loss_function, opt_func=optimizer, cbs=aug_cbs,
                metrics=[RecallPartial(a=i) for i in range(len(dbch.c))] + [RecallCombine()],
                splitter=lambda m: [list(m.body.parameters()), list(m.heads.parameters())],
-               model_dir=args.output)
+               model_dir=cfg.output)
     
     if cfg.gpu: learn.to_fp16()
     learn.fit_one_cycle(cfg.epochs, lr_max=slice(bot_lr, top_lr), cbs=train_cbs)

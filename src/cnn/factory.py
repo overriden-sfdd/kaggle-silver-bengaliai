@@ -5,7 +5,8 @@ from fastai2.vision.all import *
 from fastai2.callback.all import *
 from fastai2.callback.tracker import *
 from fastai2.basics import *
-from ..train_utils.bengali_funcs import GridMask
+from ..train_utils.bengali_funcs import *
+from ..train_utils.bengali_augs import *
 
 from .utils.logger import log
 gb_ns = sys.modules[__name__]
@@ -45,7 +46,7 @@ def get_cbs(cfg):
     return aug_cbs,train_cbs
 
 
-def get_optim(cfg, parameters):
-    optim = getattr(gb_ns, cfg.optim.name)(**cfg.optim.params)
+def get_optim(cfg):
+    optim = getattr(gb_ns, cfg.optim.name)
     log(f'optim: {cfg.optim.name}')
     return optim

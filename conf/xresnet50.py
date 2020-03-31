@@ -32,9 +32,9 @@ optim = dict(
 mixup = dict(name='CustomMixUp', params=dict())
 cutmix = dict(name='CutMix', params=dict())
 erase = dict(name='EraseCallback', params=dict())
-tracker = dict(name='MyTrackCallback', params=dict(al=al, probs=probs))
+tracker = dict(name='MyTrackCallback', params=dict(augs=al, probs=probs))
 
-rlrop = dict(name='ReduceLROnPlateou', params=dict(patience=3))
+rlrop = dict(name='ReduceLROnPlateau', params=dict(patience=3))
 savemodel = dict(name='SaveModelCallback', params=dict(fname=f'{arch_name}'))
 
 brightness = dict(name='Brightness', params=dict(max_lighting=0.3, p=0.5))
