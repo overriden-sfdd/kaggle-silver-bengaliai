@@ -5,6 +5,7 @@ from fastai2.vision.all import *
 from fastai2.callback.all import *
 from fastai2.callback.tracker import *
 from fastai2.basics import *
+from ..train_utils.bengali_funcs import GridMask
 
 from .utils.logger import log
 gb_ns = sys.modules[__name__]
@@ -23,8 +24,8 @@ def get_norm(tdl):
     return mega_batch_stats
 
 
-def get_model(cfg):
-    return get_object(cfg.arch_name)
+def get_arch(cfg):
+    return getattr(gb_ns, cfg.arch_name)
 
 
 def get_loss(cfg):
@@ -34,7 +35,7 @@ def get_loss(cfg):
 
 
 def get_transforms(cfg):
-    batch_tfms = [get_object(transform)(**transform.params) for transform in cfg.transforms]
+    batch_tfms = [get_object(transform)(**transform.params) for transform in cfg.data.train.transforms]
     return batch_tfms
 
 

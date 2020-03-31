@@ -23,7 +23,7 @@ class Head(Module):
     
     
 class CascadeModel(Module):
-    def __init__(self, arch, n, pre=True):
+    def __init__(self, arch, n, sz, pre=True):
         m = arch(pre)
         m = nn.Sequential(*children_and_parameters(m)[:-4])
         conv = nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1, bias=False)

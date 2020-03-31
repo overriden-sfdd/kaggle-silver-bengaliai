@@ -13,6 +13,9 @@ from fastai2.basics import *
 
 from . import factory
 from .utils.logger import logger, log
+from ..train_utils.bengali_funcs import *
+from ..train_utils.bengali_augs import *
+from ..train_utils.model import *
 del globals()['Config']
 from .utils.config import Config
 
@@ -20,9 +23,8 @@ from .utils.config import Config
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'test'])
-    parser.add_argument('pretrain', type=bool, default=True)
     parser.add_argument('config')
-    parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--fold', type=int, required=True)
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--output') 
@@ -36,7 +38,7 @@ def main():
 
     # copy command line args to cfg
     cfg.mode = args.mode
-    cfg.debug = args.debug
+    cfg.pretrain = args.pretrain
     cfg.fold = args.fold
     cfg.output = args.output
     cfg.gpu = args.gpu
@@ -46,28 +48,28 @@ def main():
     log(f'mode: {cfg.mode}')
     log(f'workdir: {cfg.workdir}')
     log(f'fold: {cfg.fold}')
-    log(f'batch size: {cfg.batch_size}')
-    log(f'acc: {cfg.data.train.n_grad_acc}')
+    log(f'batch size: {cfg.bs}')
 
-    model = factory.get_model(cfg)
+    arch = factory.get_arch(cfg)
 
     if cfg.mode == 'train':
-        train(cfg, model)
+        train(cfg, arch)
     elif cfg.mode == 'test':
         test(cfg, model)
 
 
-def train(cfg):
+def train(cfg, arch):
     image_dir = cfg.data.train.imgdir
     df = pd.read_csv(cfg.data.train.labels_df)
+    bs = cfg.bs
     
-    vocab = construct_vocab(df.loc[cfg.class_names])
+    vocab = construct_vocab(df[cfg.class_names])
     split_idx = IndexSplitter(df.loc[df.fold==cfg.fold].index)(df)
     
-    get_image = lambda x: image_dir/f'{x[0]}.png'
+    get_image = lambda x: image_dir + f'/{x[0]}.png'
     type_tfms = [[get_image, PILImageBW.create, ToTensor], [get_labels, MEMCategorize(vocab=vocab)]]
     item_tfms = [ToTensor]
-    batch_tfms = [IntToFloatTensor] + factory.get_transforms
+    batch_tfms = [IntToFloatTensor] + factory.get_transforms(cfg)
     
     dsrc = Datasets(df.values, type_tfms, splits=split_idx)
     tdl = TfmdDL(dsrc, bs=bs, after_item=item_tfms, after_batch=batch_tfms, device=default_device())
@@ -77,7 +79,7 @@ def train(cfg):
     tdl_valid = TfmdDL(dsrc.valid, bs=bs, after_item=item_tfms, after_batch=batch_tfms, device=default_device())
     
     dbch = DataLoaders(tdl_train, tdl_valid, device=default_device()) 
-    model = CascadeModel(arch=cfg.arch, n=dbch.c, pre=cfg.pretrain)
+    model = CascadeModel(arch=arch, n=dbch.c, sz=cfg.sz, pre=cfg.pretrain)
     loss_function = factory.get_loss(cfg)
     optimizer = factory.get_optim(cfg)
     bot_lr,top_lr = cfg.sliced_lr

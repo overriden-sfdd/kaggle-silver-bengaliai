@@ -5,6 +5,15 @@ from fastai2.callback.tracker import *
 from torch.distributions.beta import Beta
 
 
+class MyTrackCallback(Callback):
+    run_after,run_valid = [Normalize],False
+    def __init__(self, augs, probs): self.augs,self.probs = augs,probs    
+        
+    def aug_tracker(self, augs, probs): return augs[int(np.random.choice(len(augs), 1, p=probs))]
+    
+    def begin_batch(self): self.learn.condition = self.aug_tracker(self.augs, self.probs)
+        
+
 def NoLoss(*o): pass
 class CustomMixUp(Callback):
     run_after,run_valid = MyTrackCallback,False
@@ -98,25 +107,15 @@ class EraseCallback(Callback):
         self.mu,self.gm,self.cutout = self.learn.condition == 'CustomMixUp',self.learn.condition == 'GridMask',self.learn.condition == 'Cutout'
         if self.mu: return
         self.learn.loss_func = NoLoss
-
-        # def after_batch(self):
+        
         if self.gm: 
-        self.dls.after_batch.fs[-2].p=0.
-        self.dls.after_batch.fs[-1].p=0.8
+            self.dls.after_batch.fs[-2].p=0.
+            self.dls.after_batch.fs[-1].p=1.
         elif self.cutout: 
-        self.dls.after_batch.fs[-1].p=0.
-        self.dls.after_batch.fs[-2].p=0.8
+            self.dls.after_batch.fs[-1].p=0.
+            self.dls.after_batch.fs[-2].p=1.
 
     def after_loss(self):
         if self.mu: return
         self.learn.loss = self.loss_func0(self.learn.pred, *self.learn.yb, cb_reduction='mean')
         self.learn.loss_func = self.loss_func0
-        
-        
-class MyTrackCallback(Callback):
-    run_after,run_valid = [Normalize],False
-    def __init__(self, augs, probs): self.augs,self.probs = augs,probs    
-        
-    def aug_tracker(self, augs, probs): return augs[int(np.random.choice(len(augs), 1, p=probs))]
-    
-    def begin_batch(self): self.learn.condition = self.aug_tracker(self.augs, self.probs)

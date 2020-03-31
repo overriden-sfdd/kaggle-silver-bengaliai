@@ -3,8 +3,8 @@ from fastai2.basics import *
     
     
 def get_labels(x): return tensor(x[1:4].astype('uint8'))    
-def constract_vocab(correct_df):
-    return L(L(o for o in df[class_name].unique() if o==o).sorted() for class_name in correct_df.columns.tolist())
+def construct_vocab(df):
+    return L(L(o for o in df[class_name].unique() if o==o).sorted() for class_name in df.columns.tolist())
     
     
 class MEMCategorize(Transform):
