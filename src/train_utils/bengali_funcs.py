@@ -115,9 +115,10 @@ class OHEM(Module):
 class RecallPartial(Metric):
     # based on AccumMetric
     "Stores predictions and targets on CPU in accumulate to perform final calculations with `func`."
-    def __init__(self, a=0, **kwargs):
+    def __init__(self, df, a=0, **kwargs):
         self.func = partial(recall_score, average='macro', zero_division=0)
         self.a = a
+        self.df = df
 
     def reset(self): self.targs,self.preds = tensor([]), tensor([])
 
@@ -134,7 +135,7 @@ class RecallPartial(Metric):
         return self.func(self.targs[:, self.a], self.preds[:, self.a])
 
     @property
-    def name(self): return df.columns[self.a+1]
+    def name(self): return self.df.columns[self.a+1]
     
 class RecallCombine(Metric):
     def accumulate(self, learn):

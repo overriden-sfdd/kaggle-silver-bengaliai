@@ -88,7 +88,7 @@ def train(cfg, arch):
     aug_cbs,train_cbs = factory.get_cbs(cfg)
     
     learn = Learner(dbch, model, loss_func=loss_function, opt_func=optimizer, cbs=aug_cbs,
-               metrics=[RecallPartial(a=i) for i in range(len(dbch.c))] + [RecallCombine()],
+               metrics=[RecallPartial(df=df, a=i) for i in range(len(dbch.c))] + [RecallCombine()],
                splitter=lambda m: [list(m.body.parameters()), list(m.heads.parameters())],
                model_dir=cfg.output)
     
