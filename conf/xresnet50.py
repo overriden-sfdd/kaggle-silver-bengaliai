@@ -35,7 +35,6 @@ erase = dict(name='EraseCallback', params=dict())
 tracker = dict(name='MyTrackCallback', params=dict(augs=al, probs=probs))
 
 rlrop = dict(name='ReduceLROnPlateau', params=dict(patience=3))
-savemodel = dict(name='SaveModelCallback', params=dict(fname=f'{arch_name}'))
 
 brightness = dict(name='Brightness', params=dict(max_lighting=0.3, p=0.5))
 contrast = dict(name='Contrast', params=dict())
@@ -51,7 +50,7 @@ data = dict(
         imgdir=images,
         transforms=[brightness, contrast, gridmask, erasing, warp, affine],
         aug_cbs=[mixup, cutmix, erase, tracker],
-        train_cbs=[rlrop, savemodel],
+        train_cbs=[rlrop],
     ),
     test = dict(
         imgdir='some_input_path_test',

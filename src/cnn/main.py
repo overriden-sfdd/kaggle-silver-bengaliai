@@ -94,6 +94,7 @@ def train(cfg, arch):
     
     if cfg.gpu: learn.to_fp16()
     learn.fit_one_cycle(cfg.epochs, lr_max=slice(bot_lr, top_lr), cbs=train_cbs)
+    learn.save(workdir+f'/xresnet50_{cfg.fold}')
     
     
 if __name__ == '__main__':
