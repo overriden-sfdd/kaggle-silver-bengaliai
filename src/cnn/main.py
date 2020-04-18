@@ -19,15 +19,19 @@ from ..train_utils.model import *
 del globals()['Config']
 from .utils.config import Config
 
+import warnings
+warnings.filterwarnings("ignore")
+warnings.simplefilter("ignore")
+
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'test'])
     parser.add_argument('config')
-    parser.add_argument('--epochs', type=int, default=40)
-    parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--fold', type=int, required=True)
+    parser.add_argument('--epochs', type=int, default=40)
     parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--output') 
     return parser.parse_args()
 
