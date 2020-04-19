@@ -134,4 +134,4 @@ input/
 # Data files
 *.csv
 *.h5
-*.pth
+*.pthinput/
