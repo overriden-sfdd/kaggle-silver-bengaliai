@@ -135,3 +135,6 @@ input/
 *.csv
 *.h5
 *.pthinput/
+
+# vscode files
+.vscode
