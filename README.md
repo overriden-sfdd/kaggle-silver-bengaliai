@@ -16,13 +16,13 @@
 ├── ipynbs        # Where all notebooks with solution are located.
 └── submission    # Where submission files are saved.
 ```
-Missing directories will be created with `./bin/setup_env.sh` once you run it. For custom directories names you should specify everything in `./bin/setup_env.sh file` (but after this you should to change these names inside of the config file).
+Missing directories will be created with `./bin/setup_env.sh` once you run it. For custom directories names you should specify everything in `./bin/setup_env.sh file` (but after this you should change these names inside of the config file).
 
 Everything inside of `config.py` can be replaced by the custom `paths/functions` etc. Once you've changed everything inside of the `config.py`, you need to add your custom functions and augmentations in `src/train_utils/bengali_funcs.py` and `src/train_utils/bengali_augs` respectively. 
 
 ## How to run
 
-First of all, you need to run `./bin/setup_env.sh` which will create all folders you need. Second, you need to place your files in directories created by `./bin/setup_env.sh`. You can do it by simply running: mv `path_to_your_files` `created_directories`. 
+First of all, you need to run `./bin/setup_env.sh` which will create all directories you need. Second, you need to place your files in directories created by `./bin/setup_env.sh`. You can do it by running simply `mv path_to_your_files created_directories`. 
 
 Please make sure you run each of the scripts from parent directory of `./bin`.
 
