@@ -116,7 +116,7 @@ class RecallPartial(Metric):
     # based on AccumMetric
     "Stores predictions and targets on CPU in accumulate to perform final calculations with `func`."
     def __init__(self, df, a=0, **kwargs):
-        self.func = partial(recall_score, average='macro', zero_division=0)
+        self.func = partial(recall_score, average='macro')
         self.a = a
         self.df = df
 

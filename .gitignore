@@ -129,8 +129,7 @@ dmypy.json
 .pyre/
 
 # Input data
-# input/
-model/
+input/
 
 # Data files
 *.csv

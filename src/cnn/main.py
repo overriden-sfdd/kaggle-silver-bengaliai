@@ -10,6 +10,8 @@ from fastai2.vision.all import *
 from fastai2.callback.all import *
 from fastai2.callback.tracker import *
 from fastai2.basics import *
+from sklearn.metrics import recall_score
+from sklearn.model_selection import KFold
 
 from . import factory
 from .utils.logger import logger, log
@@ -32,7 +34,6 @@ def get_args():
     parser.add_argument('--epochs', type=int, default=40)
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--pretrain', type=bool, default=True)
-    parser.add_argument('--output') 
     return parser.parse_args()
 
 
@@ -46,7 +47,6 @@ def main():
     cfg.pretrain = args.pretrain
     cfg.fold = args.fold
     cfg.epochs = args.epochs
-    cfg.output = args.output
     cfg.gpu = args.gpu
 
     logger.setup(cfg.workdir, name='%s_fold%d' % (cfg.mode, cfg.fold))
@@ -90,16 +90,18 @@ def train(cfg, arch):
     optimizer = factory.get_optim(cfg)
     bot_lr,top_lr = cfg.sliced_lr
     aug_cbs,train_cbs = factory.get_cbs(cfg)
+    train_cbs += [SaveModelCallback(fname='/xresnet50_{cfg.fold}')]
     
+
     learn = Learner(dbch, model, loss_func=loss_function, opt_func=optimizer, cbs=aug_cbs,
                metrics=[RecallPartial(df=df, a=i) for i in range(len(dbch.c))] + [RecallCombine()],
                splitter=lambda m: [list(m.body.parameters()), list(m.heads.parameters())],
-               model_dir=cfg.output)
-    
+               workdir=f'./{cfg.workdir}')
+               
     if cfg.gpu: learn.to_fp16()
     learn.fit_one_cycle(cfg.epochs, lr_max=slice(bot_lr, top_lr), cbs=train_cbs)
-    learn.save(workdir+f'/xresnet50_{cfg.fold}')
-    
+
+ 
     
 if __name__ == '__main__':
 
