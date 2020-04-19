@@ -1,6 +1,7 @@
 # Kaggle-silver-bengaliai FASTAI2
 
-- It ended up at [61th place, top 3%](https://www.kaggle.com/c/bengaliai-cv19/leaderboard) in the competition.
+- It ended up at [61th place, top 3%](https://www.kaggle.com/c/bengaliai-cv19/leaderboard) in the competition. Team Name
+ is **Russell Ershov** (was Dead AI but for some unexplained reasons it's not).
 - This is my 5th real competition in ML and the second in computer vision area. Everything was done solo. 
 
 ## Directory layout
@@ -21,7 +22,7 @@ Everything inside of `config.py` can be replaced by the custom `paths/functions`
 
 ## How to run
 
-First of all, you need to run `./bin/setup.sh` which will create all folders you need. Second, you need to place your files in directories created by `setup_env.sh`. You can do it by simply running: mv `path_to_your_files` `created_directories`. 
+First of all, you need to run `./bin/setup_env.sh` which will create all folders you need. Second, you need to place your files in directories created by `./bin/setup_env.sh`. You can do it by simply running: mv `path_to_your_files` `created_directories`. 
 
 Please make sure you run each of the scripts from parent directory of `./bin`.
 
