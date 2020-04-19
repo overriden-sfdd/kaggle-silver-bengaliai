@@ -2,9 +2,7 @@ workdir = 'model/xresnet50'
 
 
 sz = 128
-bs = 16
-nfolds = 5 #keep the same split as the initial dataset
-fold = 0
+bs = 128
 arch_name = 'xresnet50'
 SEED = 1337
 sliced_lr = (1e-3, 1e-2)
